@@ -13,6 +13,7 @@
 //limitations under the License.
 
 using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
 using System.Collections.ObjectModel;
 
 namespace Appium.Interfaces.Generic.SearchContext
@@ -28,7 +29,7 @@ namespace Appium.Interfaces.Generic.SearchContext
         /// <param name="by">The locating mechanism to use.</param>
         /// <returns>The first matching <see cref="IWebElement"/> on the current context.</returns>
         /// <exception cref="NoSuchElementException">If no element matches the criteria.</exception>
-        W FindElement(By by);
+        W FindElement(MobileBy by);
 
         /// <summary>
         /// Finds all <see cref="IWebElement">IWebElements</see> within the current context 
@@ -37,6 +38,6 @@ namespace Appium.Interfaces.Generic.SearchContext
         /// <param name="by">The locating mechanism to use.</param>
         /// <returns>A <see cref="ReadOnlyCollection{T}"/> of all <see cref="IWebElement">WebElements</see>
         /// matching the current criteria, or an empty list if nothing matches.</returns>
-        ReadOnlyCollection<W> FindElements(By by);
+        ReadOnlyCollection<W> FindElements(MobileBy by);
     }
 }

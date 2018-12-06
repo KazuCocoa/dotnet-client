@@ -218,14 +218,14 @@ namespace OpenQA.Selenium.Appium
         /// </summary>
         /// <param name="by">Mechanism to find element</param>
         /// <returns>first element found</returns>
-        public new AppiumWebElement FindElement(By by) => (AppiumWebElement) base.FindElement(by);
+        public AppiumWebElement FindElement(MobileBy by) => (AppiumWebElement) base.FindElement(by);
 
         /// <summary>
         /// Find the elements on the page by using the <see cref="T:OpenQA.Selenium.By"/> object and returns a ReadonlyCollection of the Elements on the page 
         /// </summary>
         /// <param name="by">Mechanism to find element</param>
         /// <returns>ReadOnlyCollection of elements found</returns
-        public new ReadOnlyCollection<AppiumWebElement> FindElements(By by) =>
+        public ReadOnlyCollection<AppiumWebElement> FindElements(MobileBy by) =>
             ConvertToExtendedWebElementCollection(base.FindElements(by));
 
         public new AppiumWebElement FindElement(string by, string value) =>

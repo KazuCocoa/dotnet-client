@@ -5,6 +5,7 @@ using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Android;
 using OpenQA.Selenium.Remote;
 using System;
+using OpenQA.Selenium.Support.UI;
 
 namespace Appium.Integration.Tests.Android
 {
@@ -15,16 +16,7 @@ namespace Appium.Integration.Tests.Android
         [OneTimeSetUp]
         public void BeforeAll()
         {
-            AppiumOptions capabilities = Env.isSauce()
-                ? Caps.getAndroid501Caps(Apps.get("androidApiDemos"))
-                : Caps.getAndroid19Caps(Apps.get("androidApiDemos"));
-            if (Env.isSauce())
-            {
-                capabilities.AddAdditionalCapability("username", Env.getEnvVar("SAUCE_USERNAME"));
-                capabilities.AddAdditionalCapability("accessKey", Env.getEnvVar("SAUCE_ACCESS_KEY"));
-                capabilities.AddAdditionalCapability("name", "android - simple");
-                capabilities.AddAdditionalCapability("tags", new string[] {"sample"});
-            }
+            AppiumOptions capabilities = Caps.getAndroid501Caps("/Users/kazuaki/GitHub/ruby_lib_core/test/functional/app/api.apk.zip");
             Uri serverUri = Env.isSauce() ? AppiumServers.sauceURI : AppiumServers.LocalServiceURIAndroid;
             driver = new AndroidDriver<AndroidElement>(serverUri, capabilities, Env.INIT_TIMEOUT_SEC);
             driver.Manage().Timeouts().ImplicitWait = Env.IMPLICIT_TIMEOUT_SEC;
@@ -36,11 +28,17 @@ namespace Appium.Integration.Tests.Android
             driver.StartActivity("io.appium.android.apis", ".ApiDemos");
         }
 
+
         [Test()]
         public void FindByAccessibilityIdTest()
         {
             By byAccessibilityId = new ByAccessibilityId("Graphics");
-            Assert.AreNotEqual(driver.FindElementById("android:id/content").FindElement(byAccessibilityId).Text, null);
+            Assert.AreEqual(driver.FindElementById("android:id/content").Text, "");
+
+            AppiumWebElement el = (AppiumWebElement)new WebDriverWait(driver, TimeSpan.FromSeconds(30.0)).Until(x => x.FindElement(MobileBy.Id("android:id/content")));
+            Assert.AreEqual(el.Text, "");
+
+            Assert.AreNotEqual(el.FindElement(byAccessibilityId).Text, null);
             Assert.GreaterOrEqual(driver.FindElementById("android:id/content").FindElements(byAccessibilityId).Count,
                 1);
         }
@@ -93,7 +91,7 @@ namespace Appium.Integration.Tests.Android
         public void ScrollingToSubElement()
         {
             driver.FindElementByAccessibilityId("Views").Click();
-            AndroidElement list = driver.FindElement(By.Id("android:id/list"));
+            AndroidElement list = driver.FindElement(MobileBy.Id("android:id/list"));
             var locator = new ByAndroidUIAutomator("new UiScrollable(new UiSelector()).scrollIntoView("
                                                    + "new UiSelector().text(\"Radio Group\"));");
             AppiumWebElement radioGroup = list.FindElement(locator);

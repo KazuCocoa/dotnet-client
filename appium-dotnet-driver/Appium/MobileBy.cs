@@ -18,10 +18,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
+using Appium.Interfaces.Generic.SearchContext;
 
 namespace OpenQA.Selenium.Appium
 {
-    public abstract class MobileBy : By
+    public class MobileBy : By
     {
         private const string FindsByFluentSelector = "IFindsByFluentSelector";
         private const string SingleFluentCriteriaFindBy = "FindElement";
@@ -57,6 +58,54 @@ namespace OpenQA.Selenium.Appium
             SingleSearchMethodName = singleSearchMethodName;
             ListSearchMethodName = listSearchMethodName;
             SearchingCriteriaName = searchingCriteriaName;
+        }
+
+        protected MobileBy(Func<ISearchContext, IWebElement> findElementMethod, Func<ISearchContext, ReadOnlyCollection<IWebElement>> findElementsMethod)
+        {
+            this.FindElementMethod = findElementMethod;
+            this.FindElementsMethod = findElementsMethod;
+        }
+
+        protected new Func<ISearchContext, IWebElement> FindElementMethod { get; set; }
+
+        protected new Func<ISearchContext, ReadOnlyCollection<IWebElement>> FindElementsMethod { get; set; }
+
+        protected MobileBy()
+        {
+        }
+
+        protected new string Description { get; set; } = "OpenQA.Selenium.By";
+
+        public new static MobileBy Id(string idToFind)
+        {
+            if (idToFind == null)
+            {
+                throw new ArgumentNullException("idToFind", "Cannot find elements with a null id attribute.");
+            }
+
+            MobileBy by = new MobileBy();
+            by.FindElementMethod = new ById(MobileSelector.Id).FindElement(MobileBy.Id);
+            by.FindElementsMethod = (ISearchContext context) => ((IGenericFindsById<IWebElement>)context).FindElementsById(idToFind);
+
+            by.Description = "By.Id: " + idToFind;
+            return by;
+        }
+
+
+        public class ById : MobileBy
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ByAccessibilityId"/> class.
+            /// </summary>
+            /// <param name="selector">The selector to use in finding the element.</param>
+            public ById(string selector)
+                : base(selector, "IFindById", "FindElementById", "FindElementsById",
+                    MobileSelector.Id)
+            {
+            }
+
+            public override string ToString() =>
+                $"ById({selector})";
         }
 
         /// <summary>

@@ -91,9 +91,9 @@ namespace OpenQA.Selenium.Appium
 
         #region Generic FindMethods
 
-        public new W FindElement(By by) =>
+        public W FindElement(MobileBy by) =>
             (W) base.FindElement(by);
-        public new ReadOnlyCollection<W> FindElements(By by) =>
+        public ReadOnlyCollection<W> FindElements(MobileBy by) =>
             ConvertToExtendedWebElementCollection<W>(base.FindElements(by));
 
         public new W FindElement(string by, string value) => (W) base.FindElement(by, value);
