@@ -12,8 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+using Newtonsoft.Json;
 using OpenQA.Selenium.Remote;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace OpenQA.Selenium.Appium.Service
@@ -21,7 +23,7 @@ namespace OpenQA.Selenium.Appium.Service
     internal class AppiumCommandExecutor : ICommandExecutor
     {
         private readonly AppiumLocalService Service;
-        private readonly Uri URL;
+        private Uri URL;
         private ICommandExecutor RealExecutor;
         private bool isDisposed;
         private const string IdempotencyHeader = "X-Idempotency-Key";
@@ -75,6 +77,11 @@ namespace OpenQA.Selenium.Appium.Service
                 }
 
                 result = RealExecutor.Execute(commandToExecute);
+
+                // TODO add try/except
+                UpdateAsDirectConnectURL(result.ToString());
+
+
                 return result;
             }
             catch (Exception e)
@@ -109,6 +116,14 @@ namespace OpenQA.Selenium.Appium.Service
                 modifiedCommandExecutor.SendingRemoteHttpRequest += (sender, args) =>
                     args.Request.Headers.Add(IdempotencyHeader, Guid.NewGuid().ToString());
             return modifiedCommandExecutor;
+        }
+
+        private void UpdateAsDirectConnectURL(string responseBody)
+        {
+
+            var newSessionResponse = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseBody);
+
+            URL = new Uri("https://localhost");
         }
 
         public void Dispose() => Dispose(true);
